@@ -52,3 +52,32 @@ González-Santamarta, M. Á., Rodríguez-Lera, F. J., Matellán-Olivera, V., & F
 
 <a id="3">[3]</a>
 González-Santamarta, M. Á., Rodríguez-Lera, F. J., Martín, F., Fernández, C., & Matellán, V. (2022, May). KANT: A tool for grounding and knowledge management. In International Work-Conference on the Interplay Between Natural and Artificial Computation (pp. 452-461). Cham: Springer International Publishing.
+
+
+# Insalacion y ejecuciòn
+```bash
+sudo apt install -y nvidia-docker2
+sudo systemctl restart docker
+
+sudo apt install -y python3-rocker
+rocker --nvidia --volume ~/ULE/Semestre_2/Cognitiva/ws/src/Robotica_cognitiva/:/root/ros2_ws/src/Robotica_cognitiva  --x11 --pulse mgons/merlin2:humble
+
+cd /root/ros2_ws
+source /opt/ros/humble/setup.sh
+
+rm -rf build install
+
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
+
+colcon build --symlink-install --continue-on-error
+source install/setup.sh
+
+ros2 launch rb1_sandbox hospital.launch.py
+
+
+docker exec -it ] /bin/bash
+
+ros2 launch merlin2_hospital_patrolling hospital_patrolling.launch.py 
+
+```
