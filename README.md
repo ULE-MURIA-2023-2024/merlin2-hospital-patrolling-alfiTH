@@ -60,7 +60,7 @@ sudo apt install -y nvidia-docker2
 sudo systemctl restart docker
 
 sudo apt install -y python3-rocker
-rocker --nvidia --volume ~/ULE/Semestre_2/Cognitiva/ws/src/Robotica_cognitiva/:/root/ros2_ws/src/Robotica_cognitiva  --x11 --pulse mgons/merlin2:humble
+rocker --nvidia --privileged --volume ~/ULE/Semestre_2/Cognitiva/ws/src/Robotica_cognitiva/:/root/ros2_ws/src/Robotica_cognitiva  --x11 --pulse mgons/merlin2:humble
 
 cd /root/ros2_ws
 source /opt/ros/humble/setup.sh

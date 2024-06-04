@@ -18,7 +18,7 @@ from kant_dto import (
 )
 
 wp_type = PddlTypeDto("wp")
-wp_type = PddlTypeDto("room")
+room_type = PddlTypeDto("room")
 
 
 from kant_dto import (
@@ -26,6 +26,8 @@ from kant_dto import (
 )
 
 robot_at = PddlPredicateDto("robot_at", [wp_type])
-person_at = PddlPredicateDto("room_scan", [wp_type])
+room_scan = PddlPredicateDto("room_scan", [room_type])
+room_at = PddlPredicateDto("room_at", [room_type, wp_type])
+
 
 

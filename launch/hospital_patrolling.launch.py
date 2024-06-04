@@ -72,8 +72,25 @@ def generate_launch_description():
     )
 
     # TODO: create the patrol action node
+    merlin2_hospital_patrolling_cmd = Node(
+        package="merlin2_hospital_patrolling",
+        executable="merlin2_hospital_patrolling",
+        name="room_patrol",
+        parameters=[{
+            "dao_family": dao_family,
+            "mongo_uri": mongo_uri
+        }]
+    )
     # TODO: create the mission node
-
+    merlin2_room_patrol_mission_node_cmd = Node(
+        package="merlin2_room_patrol_mission_node",
+        executable="merlin2_room_patrol_mission_node",
+        name="mission_node",
+        parameters=[{
+            "dao_family": dao_family,
+            "mongo_uri": mongo_uri
+        }]
+    )
     #
     # LAUNCHES
     #
@@ -111,6 +128,8 @@ def generate_launch_description():
     # TODO: add the patrol action node
     # TODO: add the mission node
     ld.add_action(merlin2_navigation_action_cmd)
+    ld.add_action(merlin2_hospital_patrolling_cmd)
+    ld.add_action(merlin2_room_patrol_mission_node_cmd)
 
     ld.add_action(text_to_speech_cmd)
     ld.add_action(waypoint_nav_cmd)
