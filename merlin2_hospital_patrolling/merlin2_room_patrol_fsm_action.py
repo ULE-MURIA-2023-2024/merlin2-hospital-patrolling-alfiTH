@@ -27,40 +27,32 @@ from kant_dto import (
 # Importamos nuestra estruccura de PDDL
 from .pddl import *
 
-from merlin2_fsm_action import (
-    Merlin2FsmAction,
-    Merlin2BasicStates
-)
+from merlin2_fsm_action import Merlin2FsmAction,  Merlin2BasicStates
+
 
 from yasmin import CbState
 from yasmin.blackboard import Blackboard
+
+from yasmin_ros.basic_outcomes import SUCCEED
 
 
 class Merlin2RoomPatrolFsmAction(Merlin2FsmAction):
     """ Merlin2 Navigation Action Class """
 
     def __init__(self) -> None:
-
-        self._room = PddlObjectDto(room_type, "room")
-        self._wp = PddlObjectDto(wp_type, "waypoint")
-
-
-        #Waypoints origen destino tipo wp(waypoint) en __init__
-        # self.__org = PddlObjectDto(wp_type, "o")
-        # self.__dst = PddlObjectDto(wp_type, "d")
-
         super().__init__("room_patrol")
 
+        self._room = PddlObjectDto(room_type, "room")
+        self._wp = PddlObjectDto(wp_type, "wp")
+
         ####//////////////////MAQUINA DE ESTADOS/////////////////////////////
-
-
-        rotate_state = self.create_state(Merlin2BasicStates.NAVIGATION)
+        # rotate_state = self.create_state(Merlin2BasicStates.NAVIGATION)
         tts_state = self.create_state(Merlin2BasicStates.TTS)
 
-        self.add_state(
-            "ROTATE",
-            rotate_state
-        )
+        # self.add_state(
+        #     "ROTATE",
+        #     rotate_state
+        # )
 
         self.add_state(
             "SPEAKING",
@@ -68,33 +60,33 @@ class Merlin2RoomPatrolFsmAction(Merlin2FsmAction):
         )
 
         #/////////////////// CREAR CALLBACKS////////////////////
-        prepare_rotate_state = CbState(["valid"], self.rotate_goal)
-        prepare_text_state = CbState(["valid"], self.prepare_text)
+        rotate_state = CbState([SUCCEED], self.rotate)
+        prepare_text_state = CbState([SUCCEED], self.prepare_text)
 
 
 
         self.add_state(
-            "PREPARING_ROTATE",
-            prepare_rotate_state,
-            {"valid": "ROTATE"}
+            "ROTATE",
+            rotate_state,
+            transition={SUCCEED: "PREPARING_TEXT"}
         )
 
         self.add_state(
             "PREPARING_TEXT",
             prepare_text_state,
-            {"valid": "SPEAKING"}
+            transition={SUCCEED: "SPEAKING"}
         )
 
 
-    def prepapre_rotate(self, blackboard: Blackboard) -> str:
+    def rotate(self, blackboard: Blackboard) -> str:
         #Rota
-        return "valid"
+        return SUCCEED
 
 
     def prepare_text(self, blackboard: Blackboard) -> str:
-        room_name = blackboard.merlin2_action_goal.object[0][-1]
-        blackboard.text = f"Scanned room {room_name}"
-        return "valid"
+        # room_name = blackboard.merlin2_action_goal.object[0][-1]
+        blackboard.text = f"Scanned room"# {room_name}"
+        return SUCCEED
 
 #////////////////////////ELEMENTEOS DEL PDDL//////////////
     #Parámetros el PDDL en la clase
@@ -116,7 +108,6 @@ class Merlin2RoomPatrolFsmAction(Merlin2FsmAction):
             time=PddlConditionEffectDto.AT_START,
             is_negative = False
         )
-
 
         condition_3 = PddlConditionEffectDto(
             room_at, 

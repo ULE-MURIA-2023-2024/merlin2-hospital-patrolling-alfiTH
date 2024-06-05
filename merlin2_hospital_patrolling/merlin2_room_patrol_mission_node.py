@@ -39,49 +39,53 @@ class MissionNode(Merlin2MissionNode):
         super().__init__("mission_node")
 
         #/////////////////// CREAR CALLBACKS////////////////////
-        prepare_text_state = CbState(["valid"], self.prepare_text)
-        prepare_text_state = CbState(["valid"], self.prepare_text)
-        prepare_text_state = CbState(["valid"], self.prepare_text)
+        self.prepare_goals_state = CbState(["valid"], self.prepare_goals)
+        self.check_goals_state = CbState(["next_goal", "end"], self.check_goals)
+        self.execute_scan_state = CbState(["valid"], self.execute_scan)
 
 
         self.add_state(
             "PREPARING_GOALS",
-            self.prepare_goals,
-            {"valid": "CHAKING_GOALS"}
+            self.prepare_goals_state,
+            {"valid": "CHECKING_GOALS"}
         )
 
         self.add_state(
-            "PREPARING_GOALS",
-            self.check_goals,
-            {"next_goal": "CHAKING_GOALS", "end":"end"}
+            "CHECKING_GOALS",
+            self.check_goals_state,
+            {"next_goal": "EXECUTE_MISSION", "end":"end"}
         )
 
 
         self.add_state(
-            "PREPARING_GOALS",
-            self.execute_mission,
-            {"valid": "CHAKING_GOALS"}
+            "EXECUTE_MISSION",
+            self.execute_scan_state,
+            {"valid": "CHECKING_GOALS"}
         )
 
 
     def check_goals(self, blackboard: Blackboard) -> str:
         if  blackboard.goals:
-
+            blackboard.nex_goal = blackboard.goals.pop(0)
             return "next_goal"
         return "end"
     
 
     def prepare_goals(self, blackboard: Blackboard):
-        blackboard.#TODO
+        blackboard.goals = [
+            PddlPropositionDto(room_scan, [self.room1], is_goal=True),
+            PddlPropositionDto(room_scan, [self.room2], is_goal=True),
+            PddlPropositionDto(room_scan, [self.room3], is_goal=True),
+            PddlPropositionDto(room_scan, [self.room4], is_goal=True),
+            PddlPropositionDto(room_scan, [self.room5], is_goal=True)
+        ]
         return "valid"
 
 
-    def execute_mission(self):
-        self.get_logger().info("EXECUTING MISSION")
-        person_attended_goal = PddlPropositionDto(
-            person_attended, [self.miguel], is_goal=True)
-        succeed = self.execute_goal(person_attended_goal)
-        self.get_logger().info(str(succeed))
+    def execute_scan(self, blackboard: Blackboard):
+        self.execute_mission(blackboard.next_goal)
+        return "valid"
+
 
 
     def create_objects(self):
@@ -101,8 +105,8 @@ class MissionNode(Merlin2MissionNode):
 
 
         objects = [self.wp0, self.wp1, self.wp2, self.wp3, self.wp4,
-                   self.room5, self.room1, self.room2, self.room3, self.room4]
-        return objects
+                   self.room1, self.room2, self.room3, self.room4, self.room5]
+        return objects 
 
     def create_propositions(self):
         return [

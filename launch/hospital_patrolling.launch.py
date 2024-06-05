@@ -74,7 +74,7 @@ def generate_launch_description():
     # TODO: create the patrol action node
     merlin2_hospital_patrolling_cmd = Node(
         package="merlin2_hospital_patrolling",
-        executable="merlin2_hospital_patrolling",
+        executable="merlin2_room_patrol_fsm_action",
         name="room_patrol",
         parameters=[{
             "dao_family": dao_family,
@@ -83,7 +83,7 @@ def generate_launch_description():
     )
     # TODO: create the mission node
     merlin2_room_patrol_mission_node_cmd = Node(
-        package="merlin2_room_patrol_mission_node",
+        package="merlin2_hospital_patrolling",
         executable="merlin2_room_patrol_mission_node",
         name="mission_node",
         parameters=[{
