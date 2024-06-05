@@ -17,23 +17,17 @@
 
 
 import rclpy
+from merlin2_mission import Merlin2FsmMissionNode
+from merlin2_hospital_patrolling.pddl import *
 
-from merlin2_mission import Merlin2MissionNode
-
-from .pddl import *
-
-from kant_dto import (
-    PddlObjectDto,
-    PddlPropositionDto
-)
-
-from merlin2_demo.pddl import person_attended
+from kant_dto import PddlObjectDto, PddlPropositionDto
 
 from yasmin import CbState
 from yasmin.blackboard import Blackboard
+from yasmin_ros.basic_outcomes import SUCCEED
 
 
-class MissionNode(Merlin2MissionNode):
+class MissionNode(Merlin2FsmMissionNode):
 
     def __init__(self) -> None:
         super().__init__("mission_node")
@@ -53,7 +47,7 @@ class MissionNode(Merlin2MissionNode):
         self.add_state(
             "CHECKING_GOALS",
             self.check_goals_state,
-            {"next_goal": "EXECUTE_MISSION", "end":"end"}
+            {"next_goal": "EXECUTE_MISSION", "end":SUCCEED}
         )
 
 
@@ -66,7 +60,7 @@ class MissionNode(Merlin2MissionNode):
 
     def check_goals(self, blackboard: Blackboard) -> str:
         if  blackboard.goals:
-            blackboard.nex_goal = blackboard.goals.pop(0)
+            blackboard.next_goal = blackboard.goals.pop(0)
             return "next_goal"
         return "end"
     
@@ -83,9 +77,8 @@ class MissionNode(Merlin2MissionNode):
 
 
     def execute_scan(self, blackboard: Blackboard):
-        self.execute_mission(blackboard.next_goal)
+        self.execute_goal(blackboard.next_goal)
         return "valid"
-
 
 
     def create_objects(self):
@@ -96,15 +89,14 @@ class MissionNode(Merlin2MissionNode):
         self.wp4 = PddlObjectDto(wp_type, "wp4")
         self.wp5 = PddlObjectDto(wp_type, "wp5")
 
-        self.room1 = PddlObjectDto(wp_type, "room1")
-        self.room2 = PddlObjectDto(wp_type, "room2")
-        self.room3 = PddlObjectDto(wp_type, "room3")
-        self.room4 = PddlObjectDto(wp_type, "room4")
-        self.room5 = PddlObjectDto(wp_type, "room5")
+        self.room1 = PddlObjectDto(room_type, "room1")
+        self.room2 = PddlObjectDto(room_type, "room2")
+        self.room3 = PddlObjectDto(room_type, "room3")
+        self.room4 = PddlObjectDto(room_type, "room4")
+        self.room5 = PddlObjectDto(room_type, "room5")
 
 
-
-        objects = [self.wp0, self.wp1, self.wp2, self.wp3, self.wp4,
+        objects = [self.wp0, self.wp1, self.wp2, self.wp3, self.wp4, self.wp5,
                    self.room1, self.room2, self.room3, self.room4, self.room5]
         return objects 
 
@@ -117,8 +109,6 @@ class MissionNode(Merlin2MissionNode):
             PddlPropositionDto(room_at, [self.room4, self.wp4]),
             PddlPropositionDto(room_at, [self.room5, self.wp5]),
             ]
-
-
 
 
 def main():
