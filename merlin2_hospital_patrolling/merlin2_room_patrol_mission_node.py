@@ -19,6 +19,7 @@
 import rclpy
 from merlin2_mission import Merlin2FsmMissionNode
 from merlin2_hospital_patrolling.pddl import *
+from merlin2_basic_actions.merlin2_basic_types import wp_type
 
 from kant_dto import PddlObjectDto, PddlPropositionDto
 
@@ -99,6 +100,111 @@ class MissionNode(Merlin2FsmMissionNode):
         objects = [self.wp0, self.wp1, self.wp2, self.wp3, self.wp4, self.wp5,
                    self.room1, self.room2, self.room3, self.room4, self.room5]
         return objects 
+import rclpy
+from merlin2_mission import Merlin2FsmMissionNode
+from merlin2_hospital_patrolling.pddl import *
+
+from kant_dto import PddlObjectDto, PddlPropositionDto
+
+from yasmin import CbState
+from yasmin.blackboard import Blackboard
+from yasmin_ros.basic_outcomes import SUCCEED
+
+
+class MissionNode(Merlin2FsmMissionNode):
+
+    def __init__(self) -> None:
+        super().__init__("mission_node")
+
+        #/////////////////// CREAR CALLBACKS////////////////////
+        self.prepare_goals_state = CbState(["valid"], self.prepare_goals)
+        self.check_goals_state = CbState(["next_goal", "end"], self.check_goals)
+        self.execute_scan_state = CbState(["valid"], self.execute_scan)
+
+
+        self.add_state(
+            "PREPARING_GOALS",
+            self.prepare_goals_state,
+            {"valid": "CHECKING_GOALS"}
+        )
+
+        self.add_state(
+            "CHECKING_GOALS",
+            self.check_goals_state,
+            {"next_goal": "EXECUTE_MISSION", "end":SUCCEED}
+        )
+
+
+        self.add_state(
+            "EXECUTE_MISSION",
+            self.execute_scan_state,
+            {"valid": "CHECKING_GOALS"}
+        )
+
+
+    def check_goals(self, blackboard: Blackboard) -> str:
+        if  blackboard.goals:
+            blackboard.next_goal = blackboard.goals.pop(0)
+            return "next_goal"
+        return "end"
+    
+
+    def prepare_goals(self, blackboard: Blackboard):
+        blackboard.goals = [
+            PddlPropositionDto(room_scan, [self.room1], is_goal=True),
+            PddlPropositionDto(room_scan, [self.room2], is_goal=True),
+            PddlPropositionDto(room_scan, [self.room3], is_goal=True),
+            PddlPropositionDto(room_scan, [self.room4], is_goal=True),
+            PddlPropositionDto(room_scan, [self.room5], is_goal=True)
+        ]
+        return "valid"
+
+
+    def execute_scan(self, blackboard: Blackboard):
+        self.execute_goal(blackboard.next_goal)
+        return "valid"
+
+
+    def create_objects(self):
+        self.wp0 = PddlObjectDto(wp_type, "wp0")
+        self.wp1 = PddlObjectDto(wp_type, "wp1")
+        self.wp2 = PddlObjectDto(wp_type, "wp2")
+        self.wp3 = PddlObjectDto(wp_type, "wp3")
+        self.wp4 = PddlObjectDto(wp_type, "wp4")
+        self.wp5 = PddlObjectDto(wp_type, "wp5")
+
+        self.room1 = PddlObjectDto(room_type, "room1")
+        self.room2 = PddlObjectDto(room_type, "room2")
+        self.room3 = PddlObjectDto(room_type, "room3")
+        self.room4 = PddlObjectDto(room_type, "room4")
+        self.room5 = PddlObjectDto(room_type, "room5")
+
+
+        objects = [self.wp0, self.wp1, self.wp2, self.wp3, self.wp4, self.wp5,
+                   self.room1, self.room2, self.room3, self.room4, self.room5]
+        return objects 
+
+    def create_propositions(self):
+        return [
+            PddlPropositionDto(robot_at, [self.wp0]),
+            PddlPropositionDto(room_at, [self.room1, self.wp1]),
+            PddlPropositionDto(room_at, [self.room2, self.wp2]),
+            PddlPropositionDto(room_at, [self.room3, self.wp3]),
+            PddlPropositionDto(room_at, [self.room4, self.wp4]),
+            PddlPropositionDto(room_at, [self.room5, self.wp5]),
+            ]
+
+
+def main():
+    rclpy.init()
+    node = MissionNode()
+    node.execute_mission()
+    node.join_spin()
+    rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()
 
     def create_propositions(self):
         return [

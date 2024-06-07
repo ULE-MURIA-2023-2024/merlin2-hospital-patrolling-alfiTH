@@ -54,7 +54,7 @@ González-Santamarta, M. Á., Rodríguez-Lera, F. J., Matellán-Olivera, V., & F
 González-Santamarta, M. Á., Rodríguez-Lera, F. J., Martín, F., Fernández, C., & Matellán, V. (2022, May). KANT: A tool for grounding and knowledge management. In International Work-Conference on the Interplay Between Natural and Artificial Computation (pp. 452-461). Cham: Springer International Publishing.
 
 
-# Insalacion y ejecuciòn
+# Instalación y ejecución del programa
 ```bash
 sudo apt install -y nvidia-docker2
 sudo systemctl restart docker
@@ -81,3 +81,12 @@ docker exec -it ] /bin/bash
 ros2 launch merlin2_hospital_patrolling hospital_patrolling.launch.py 
 
 ```
+
+## Resultados 
+Al lanzar el simulador se observan muchos errores con la cola llena y se descartan mensajes, pero el programa de merlin si llega a realizar el código de PDDL
+
+![terminal](images/terminal.png)
+
+El resultado de las máquinas de estados es el siguiente mediante el visualizador de yasmin:
+
+![yasmin](images/yasmin.png)

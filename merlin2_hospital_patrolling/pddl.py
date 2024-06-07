@@ -13,11 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from merlin2_basic_actions.merlin2_basic_types import wp_type
+
 from kant_dto import (
     PddlTypeDto
 )
 
-wp_type = PddlTypeDto("wp")
+# wp_type = PddlTypeDto("wp")
 room_type = PddlTypeDto("room")
 
 

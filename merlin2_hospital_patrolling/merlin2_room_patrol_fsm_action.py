@@ -20,6 +20,7 @@
 
 from typing import List
 import rclpy
+from merlin2_basic_actions.merlin2_basic_types import wp_type
 
 from kant_dto import (
     PddlObjectDto,              #Para decidir los parámetros
@@ -106,7 +107,7 @@ class Merlin2RoomPatrolFsmAction(Merlin2FsmAction):
             room_scan, 
             [self._room], 
             time=PddlConditionEffectDto.AT_START,
-            is_negative = True
+            is_negative = False
         )
 
         condition_3 = PddlConditionEffectDto(
@@ -115,7 +116,7 @@ class Merlin2RoomPatrolFsmAction(Merlin2FsmAction):
             time=PddlConditionEffectDto.AT_START
         )
 
-        return [condition_2, condition_1,  condition_3] 
+        return [condition_1,  condition_3] 
 
     def create_efects(self) -> List[PddlConditionEffectDto]:
         effect_1 = PddlConditionEffectDto(
